@@ -3,17 +3,21 @@ import argparse
 
 def parse_log(filename):
     failed_counts = {}
+    try:
+        with open(filename, "r") as file:
+            for line in file:
+                if "Failed password" in line:
+                    parts = line.split()
+                    ip = parts[parts.index("from") + 1]
 
-    with open(filename, "r") as file:
-        for line in file:
-            if "Failed password" in line:
-                parts = line.split()
-                ip = parts[parts.index("from") + 1]
+                    if ip in failed_counts:
+                        failed_counts[ip] += 1
+                    else:
+                        failed_counts[ip] = 1
 
-                if ip in failed_counts:
-                    failed_counts[ip] += 1
-                else:
-                    failed_counts[ip] = 1
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+        raise SystemExit(1)
 
     return failed_counts
 
